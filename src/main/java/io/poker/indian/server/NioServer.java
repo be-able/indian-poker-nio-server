@@ -62,8 +62,6 @@ public class NioServer implements Runnable {
         socketChannel.socket().getInetAddress().toString() + ":" + socketChannel.socket().getPort();
     socketChannel.configureBlocking(false);
     socketChannel.register(selector, SelectionKey.OP_READ, address);
-    socketChannel.write(welcomeBuf);
-    welcomeBuf.rewind();
     System.out.println("accepted connection from: " + address);
   }
 
@@ -93,12 +91,17 @@ public class NioServer implements Runnable {
   }
 
   private void broadcast(String msg) throws IOException {
+
     ByteBuffer msgBuf = ByteBuffer.wrap(msg.getBytes());
     for (SelectionKey key : selector.keys()) {
       if (key.isValid() && key.channel() instanceof SocketChannel) {
         SocketChannel socketChannel = (SocketChannel) key.channel();
+        String address =
+            socketChannel.socket().getInetAddress().toString() + ":" + socketChannel.socket().getPort();
+        socketChannel.register(selector, SelectionKey.OP_WRITE, address);
         socketChannel.write(msgBuf);
         msgBuf.rewind();
+        socketChannel.register(selector, SelectionKey.OP_READ, address);
       }
     }
   }
