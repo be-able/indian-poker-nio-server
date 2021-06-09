@@ -9,50 +9,53 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 public class NioServer implements Runnable {
 
   private ByteBuffer buf = ByteBuffer.allocate(256);
-  private int port;
   private Selector selector;
   private ServerSocketChannel serverSocketChannel;
   private final ByteBuffer welcomeBuf = ByteBuffer.wrap("Welcome to NioServer!\n".getBytes());
 
   public NioServer(int port) throws IOException {
-    this.port = port;
     this.serverSocketChannel = ServerSocketChannel.open();
-    this.serverSocketChannel.bind(new InetSocketAddress(port));
-    this.serverSocketChannel.configureBlocking(false);
     this.selector = Selector.open();
-    this.serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+    this.serverSocketChannel
+        .bind(new InetSocketAddress(port))
+        .configureBlocking(false)
+        .register(selector, SelectionKey.OP_ACCEPT);
   }
 
   @Override
   public void run() {
     try {
-      System.out.println("Server starting on port " + this.port);
+      runServer();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-      Iterator<SelectionKey> iter;
-      SelectionKey key;
-      while (this.serverSocketChannel.isOpen()) {
-        selector.select();
-        iter = this.selector.selectedKeys().iterator();
-        while (iter.hasNext()) {
-          key = iter.next();
-          iter.remove();
+  private void runServer() throws IOException {
+    Iterator<SelectionKey> iter;
+    SelectionKey key;
+    while (serverSocketChannel.isOpen()) {
+      selector.select();
+      iter = this.selector.selectedKeys().iterator();
+      while (iter.hasNext()) {
+        key = iter.next();
+        iter.remove();
 
-          if (key.isAcceptable()) {
-            this.handleAccept(key);
-          }
-          if (key.isReadable()) {
-            this.handleRead(key);
-          }
+        if (key.isAcceptable()) {
+          this.handleAccept(key);
+        }
+        if (key.isReadable()) {
+          this.handleRead(key);
         }
       }
-    } catch (IOException e) {
-      System.out.println("IOException, server of port " + this.port + " terminating. Stack trace:");
-      e.printStackTrace();
     }
   }
 
@@ -62,7 +65,9 @@ public class NioServer implements Runnable {
         socketChannel.socket().getInetAddress().toString() + ":" + socketChannel.socket().getPort();
     socketChannel.configureBlocking(false);
     socketChannel.register(selector, SelectionKey.OP_READ, address);
-    System.out.println("accepted connection from: " + address);
+    socketChannel.write(welcomeBuf);
+    welcomeBuf.rewind();
+    log.info("Server :: accepted connection from: " + address);
   }
 
   private void handleRead(SelectionKey key) throws IOException {
@@ -78,30 +83,28 @@ public class NioServer implements Runnable {
       sb.append(new String(bytes));
       buf.clear();
     }
-    String msg;
+    String message;
     if (read < 0) {
-      msg = key.attachment() + " left the chat.\n";
+      message = key.attachment() + " left the chat.\n";
       socketChannel.close();
     } else {
-      msg = key.attachment() + ": " + sb.toString();
+      message = key.attachment() + ": " + sb.toString();
     }
 
-    System.out.println(msg);
-    broadcast(msg);
+    log.info("Server :: " + message);
+    broadcast(message);
   }
 
   private void broadcast(String msg) throws IOException {
-
     ByteBuffer msgBuf = ByteBuffer.wrap(msg.getBytes());
     for (SelectionKey key : selector.keys()) {
       if (key.isValid() && key.channel() instanceof SocketChannel) {
         SocketChannel socketChannel = (SocketChannel) key.channel();
         String address =
-            socketChannel.socket().getInetAddress().toString() + ":" + socketChannel.socket().getPort();
-        socketChannel.register(selector, SelectionKey.OP_WRITE, address);
+            socketChannel.socket().getInetAddress() + ":" + socketChannel.socket().getPort();
+        socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, address);
         socketChannel.write(msgBuf);
         msgBuf.rewind();
-        socketChannel.register(selector, SelectionKey.OP_READ, address);
       }
     }
   }

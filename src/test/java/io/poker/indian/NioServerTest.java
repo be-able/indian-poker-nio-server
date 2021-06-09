@@ -20,6 +20,6 @@ public class NioServerTest {
 
     Thread.sleep(10000);
 
-    assertThat(NioClient.getRecentMessages().get(0)).contains("DONE");
+    assertThat(NioClient.getRecentMessages().get(0)).contains("Welcome");
   }
 }
