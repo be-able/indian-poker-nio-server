@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.BasicConfigurator;
 
 @Slf4j
 public class NioClient implements Runnable {
@@ -26,11 +27,12 @@ public class NioClient implements Runnable {
   }
 
   public void run() {
+    BasicConfigurator.configure();
     log.info("Client :: Start");
     try (Selector selector = Selector.open(); SocketChannel socketChannel = SocketChannel.open()) {
-      socketChannel.configureBlocking(false);            //소켓채널 비차단모드로 설정
-      socketChannel.connect(addr);                //서버주소 지정
-      socketChannel.register(selector, SelectionKey.OP_CONNECT);  //연결모드로 설정
+      socketChannel.configureBlocking(false);
+      socketChannel.connect(addr);
+      socketChannel.register(selector, SelectionKey.OP_CONNECT);
       this.selector = selector;
 
       while (!Thread.currentThread().isInterrupted() && socketChannel.isOpen()) {
@@ -111,7 +113,7 @@ public class NioClient implements Runnable {
       message = sb.toString();
     }
 
-    System.out.println("Client :: msg :: " + message);
+    log.info("Client :: msg :: " + message);
     recentMessages.add(message);
   }
 }

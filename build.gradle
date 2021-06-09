@@ -13,7 +13,10 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.18'
     compileOnly 'org.projectlombok:lombok:1.18.18'
     annotationProcessor 'org.projectlombok:lombok:1.18.18'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

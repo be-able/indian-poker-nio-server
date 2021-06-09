@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.BasicConfigurator;
 
 @Data
 @Slf4j
@@ -21,6 +22,7 @@ public class NioServer implements Runnable {
   private final ByteBuffer welcomeBuf = ByteBuffer.wrap("Welcome to NioServer!\n".getBytes());
 
   public NioServer(int port) throws IOException {
+    BasicConfigurator.configure();
     this.serverSocketChannel = ServerSocketChannel.open();
     this.selector = Selector.open();
 
