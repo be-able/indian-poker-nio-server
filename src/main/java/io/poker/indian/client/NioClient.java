@@ -63,7 +63,7 @@ public class NioClient implements Runnable {
   }
 
   /**
-   * key.isConnectable()일때 key의 소켓을 서버에 연결하고 소켓모드를 OP_WRITE로 바꾼다.
+   * key.isConnectable()일때 key의 소켓을 서버에 연결하고 소켓모드를 변경한다.
    */
   private void connectSocket(SelectionKey key) throws IOException {
     if (((SocketChannel) key.channel()).finishConnect()) {
