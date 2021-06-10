@@ -20,20 +20,18 @@ public class NioClient implements Runnable {
   private final InetSocketAddress addr;
   @Getter
   private static final List<String> recentMessages = new ArrayList<>();
-  private Selector selector;
 
   public NioClient(int port) {
+    BasicConfigurator.configure();
     this.addr = new InetSocketAddress("localhost", port);
   }
 
   public void run() {
-    BasicConfigurator.configure();
     log.info("Client :: Start");
     try (Selector selector = Selector.open(); SocketChannel socketChannel = SocketChannel.open()) {
       socketChannel.configureBlocking(false);
       socketChannel.connect(addr);
       socketChannel.register(selector, SelectionKey.OP_CONNECT);
-      this.selector = selector;
 
       while (!Thread.currentThread().isInterrupted() && socketChannel.isOpen()) {
         if (selector.select() > 0) {
@@ -86,9 +84,9 @@ public class NioClient implements Runnable {
       buf.clear();
       buf.put(message.getBytes());
       buf.flip();
-      socketChannel.write(buf);        //소켓채널에 데이터를 전송
+      socketChannel.write(buf);
       log.info("Client :: write :: " + buf);
-      Thread.sleep(random.nextInt(3000));    //최대 3초까지 멈춤
+      Thread.sleep(random.nextInt(3000));
     }
   }
 
