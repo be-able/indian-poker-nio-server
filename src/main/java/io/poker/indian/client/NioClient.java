@@ -39,9 +39,9 @@ public class NioClient implements Runnable {
         }
         Thread.sleep(1000);
       }
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      throw new RuntimeException(e.getMessage());
+    } catch (IOException | InterruptedException e) {
+      log.error("Client Error :: " + e.getMessage());
+      throw new RuntimeException(e);
     }
   }
 
