@@ -16,7 +16,7 @@ public class NioServerTest {
   void testRun() throws InterruptedException {
 
     NioClient nioClient = new NioClient(8000);
-    (new Thread(nioClient)).start();
+    new Thread(nioClient).start();
 
     Thread.sleep(10000);
 

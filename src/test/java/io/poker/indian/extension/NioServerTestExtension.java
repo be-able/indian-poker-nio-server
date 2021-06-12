@@ -35,7 +35,7 @@ public class NioServerTestExtension implements BeforeAllCallback, AfterAllCallba
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
     var server = new NioServer(8000);
-    (new Thread(server)).start();
+    new Thread(server).start();
   }
 
   @Override

@@ -40,7 +40,8 @@ public class NioClient implements Runnable {
         Thread.sleep(1000);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
+      throw new RuntimeException(e.getMessage());
     }
   }
 

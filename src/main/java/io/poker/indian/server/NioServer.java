@@ -37,7 +37,8 @@ public class NioServer implements Runnable {
     try {
       runServer();
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
+      throw new RuntimeException(e.getMessage());
     }
   }
 
