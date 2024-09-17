@@ -10,8 +10,19 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    implementation 'org.projectlombok:lombok:1.18.18'
+    compileOnly 'org.projectlombok:lombok:1.18.18'
+    annotationProcessor 'org.projectlombok:lombok:1.18.18'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
 
 test {
